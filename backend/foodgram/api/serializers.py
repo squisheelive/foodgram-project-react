@@ -60,7 +60,7 @@ class UserCreateSerializer(ModelSerializer):
         email = data.get('email')
         if User.objects.filter(username=username).exists():
             raise ValidationError('Такой пользователь уже существует')
-        if username == 'me':
+        if username == 'me':  # надо тут на список запрещенных никнеймов отсылать
             raise ValidationError('Данный юзернейм недоступен')
         if User.objects.filter(email=email).exists():
             raise ValidationError('Пользователь с таким email уже существует')
