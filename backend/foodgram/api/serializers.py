@@ -59,9 +59,9 @@ class UserCreateSerializer(ModelSerializer):
         username = data.get('username')
         email = data.get('email')
         if User.objects.filter(username=username).exists():
-            raise ValidationError('Такой пользователь уже существует')
+            raise ValidationError('Такой пользователь уже существует!')
         if User.objects.filter(email=email).exists():
-            raise ValidationError('Пользователь с таким email уже существует')
+            raise ValidationError('Пользователь с таким email уже существует!')
         return data
 
 
