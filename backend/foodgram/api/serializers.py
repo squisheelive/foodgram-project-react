@@ -47,7 +47,7 @@ class UserCreateSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = fields = (
+        fields = (
             'email',
             'username',
             'first_name',
@@ -60,8 +60,29 @@ class UserCreateSerializer(ModelSerializer):
         email = data.get('email')
         if User.objects.filter(username=username).exists():
             raise ValidationError('Такой пользователь уже существует')
-        if username == 'me':  # надо тут на список запрещенных никнеймов отсылать
-            raise ValidationError('Данный юзернейм недоступен')
         if User.objects.filter(email=email).exists():
             raise ValidationError('Пользователь с таким email уже существует')
+        return data
+
+
+class PasswordSerializer(ModelSerializer):
+    new_password = serializers.CharField(
+        required=True,
+        max_length=150,
+        allow_blank=False)
+    current_password = serializers.CharField(
+        required=True,
+        max_length=150,
+        allow_blank=False)
+
+    class Meta:
+        model = User
+        fields = ('new_password',
+                  'current_password')
+
+    def validate(self, data):
+        new_password = data.get('new_password')
+        current_password = data.get('current_password')
+        if new_password == current_password:
+            raise ValidationError('Новый и текущий пароли совпадают!')
         return data
