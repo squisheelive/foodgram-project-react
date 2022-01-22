@@ -86,4 +86,4 @@ class TagSerializer(ModelSerializer):
 
     class Meta:
         model = Tag
-        field = '__all__'
+        fields = '__all__'
