@@ -1,5 +1,4 @@
 import csv
-import os
 
 from recipes.models import Ingredient
 
@@ -14,9 +13,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('filename', type=str, help='filename for csv file')
-
-    def get_csv_file(self, filename):
-        return os.path.join('data', filename)
 
     def clear_model(self):
         try:
@@ -40,7 +36,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         filename = kwargs['filename']
         self.stdout.write(self.style.SUCCESS(f'filename:{filename}'))
-        file_path = self.get_csv_file(filename)
+        file_path = filename
         fieldnames = ['name', 'measurement_unit']
         line_count = 0
         try:
