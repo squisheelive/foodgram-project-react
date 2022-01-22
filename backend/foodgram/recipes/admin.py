@@ -5,6 +5,7 @@ from .models import User, Tag
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('pk', 'username', 'email', 'first_name', 'last_name')
+    list_filter = ('username', 'email')
 
 
 class TagAdmin(admin.ModelAdmin):
