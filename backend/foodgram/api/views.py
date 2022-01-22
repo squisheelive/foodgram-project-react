@@ -1,11 +1,13 @@
 from rest_framework import viewsets, mixins, status
-from recipes.models import User, Tag
+from recipes.models import User, Tag, Recipe, Ingredient
 from rest_framework.serializers import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 # from django.shortcuts import get_object_or_404
 from .serializers import (UserSerializer, UserCreateSerializer,
-                          PasswordSerializer, TagSerializer)
+                          PasswordSerializer, TagSerializer,
+                          RecipeSerializer, IngredientSerializer,
+                          IngredientAmountSerializer)
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -44,7 +46,6 @@ class UserViewSet(mixins.CreateModelMixin,
         if serializer.is_valid():
             current_password = serializer.validated_data['current_password']
             new_password = serializer.validated_data['new_password']
-            print(user.check_password(current_password))
 
             if user.check_password(current_password):
                 user.set_password(new_password)
@@ -52,6 +53,7 @@ class UserViewSet(mixins.CreateModelMixin,
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
             raise ValidationError('Текущий пароль введен неверно!')
+
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
@@ -63,3 +65,21 @@ class TagViewSet(mixins.ListModelMixin,
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
+
+
+class IngredientViewSet(mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    pagination_class = None
+
+
+class IngredientAmountViewSet(viewsets.ModelViewSet):
+    serializer_class = IngredientAmountSerializer
+    pagination_class = None
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
