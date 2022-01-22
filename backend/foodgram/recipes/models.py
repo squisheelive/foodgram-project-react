@@ -18,8 +18,8 @@ class Follow(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True)
     color = ColorField(default='#00ff80')
 
 

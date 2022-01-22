@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError, ModelSerializer
-from recipes.models import User
+from recipes.models import User, Tag
 
 
 class UserSerializer(ModelSerializer):
@@ -30,20 +30,16 @@ class UserCreateSerializer(ModelSerializer):
         max_length=254)
     username = serializers.CharField(
         required=True,
-        max_length=150,
-        allow_blank=False)
+        max_length=150,)
     first_name = serializers.CharField(
         required=True,
-        max_length=150,
-        allow_blank=False)
+        max_length=150,)
     last_name = serializers.CharField(
         required=True,
-        max_length=150,
-        allow_blank=False)
+        max_length=150,)
     password = serializers.CharField(
         required=True,
-        max_length=150,
-        allow_blank=False)
+        max_length=150,)
 
     class Meta:
         model = User
@@ -68,12 +64,10 @@ class UserCreateSerializer(ModelSerializer):
 class PasswordSerializer(ModelSerializer):
     new_password = serializers.CharField(
         required=True,
-        max_length=150,
-        allow_blank=False)
+        max_length=150,)
     current_password = serializers.CharField(
         required=True,
-        max_length=150,
-        allow_blank=False)
+        max_length=150,)
 
     class Meta:
         model = User
@@ -86,3 +80,10 @@ class PasswordSerializer(ModelSerializer):
         if new_password == current_password:
             raise ValidationError('Новый и текущий пароли совпадают!')
         return data
+
+
+class TagSerializer(ModelSerializer):
+
+    class Meta:
+        model = Tag
+        field = '__all__'

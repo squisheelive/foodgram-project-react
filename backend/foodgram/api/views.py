@@ -1,11 +1,11 @@
 from rest_framework import viewsets, mixins, status
-from recipes.models import User
+from recipes.models import User, Tag
 from rest_framework.serializers import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 # from django.shortcuts import get_object_or_404
 from .serializers import (UserSerializer, UserCreateSerializer,
-                          PasswordSerializer)
+                          PasswordSerializer, TagSerializer)
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -55,3 +55,10 @@ class UserViewSet(mixins.CreateModelMixin,
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+class TagViewSet(mixins.ListModelMixin,
+                 mixins.RetrieveModelMixin,
+                 viewsets.GenericViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
