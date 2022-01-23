@@ -3,7 +3,7 @@ from recipes.models import User, Tag, Recipe, Ingredient
 from rest_framework.serializers import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from .serializers import (UserSerializer, UserCreateSerializer,
                           PasswordSerializer, TagSerializer,
                           RecipeListSerializer, IngredientSerializer,
@@ -27,6 +27,12 @@ class UserViewSet(mixins.CreateModelMixin,
         if self.action == 'retrieve':
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
+
+    def perform_create(self, serializer):
+        # print(self.kwargs.get('password'))
+        pk = self.kwargs.get('pk')
+        get_object_or_404(User, pk=pk)
+        serializer.save()
 
     @action(detail=False,
             methods=['GET'],
