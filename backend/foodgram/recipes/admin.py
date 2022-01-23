@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Tag, Ingredient, Recipe, IngredientAmount
+from .models import User, Tag, Ingredient, Recipe, IngredientAmount, Follow
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -31,8 +31,14 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ('tag',)
 
 
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('user', 'following')
+    empty_value_display = '-пусто-'
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(IngredientAmount, IngredientAmountAdmin)
+admin.site.register(Follow, FollowAdmin)

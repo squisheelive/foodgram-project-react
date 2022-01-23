@@ -20,11 +20,12 @@ class UserSerializer(ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        current_user = self.context['request'].user
-        if current_user.is_authenticated:
-            return Follow.objects.filter(
-                user=current_user,
-                following=obj)
+        if self.context:
+            current_user = self.context['request'].user
+            if current_user.is_authenticated:
+                return Follow.objects.filter(
+                    user=current_user,
+                    following=obj).exists()
         return False
 
 
@@ -120,10 +121,10 @@ class IngredientAmountSerializer(ModelSerializer):
         return obj.ingredient.measurement_unit
 
 
-class RecipeSerializer(ModelSerializer):
+class RecipeListSerializer(ModelSerializer):
 
-    tag = TagSerializer(many=True, required=True)
-    author = UserSerializer(required=True)
+    tag = TagSerializer(many=True)
+    author = UserSerializer()
     ingredient = IngredientAmountSerializer(many=True, required=True)
     is_favorite = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -146,3 +147,25 @@ class RecipeSerializer(ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         return False
+
+
+class RecipeCreateSerializer(ModelSerializer):
+
+    tag = TagSerializer(many=True, required=True)
+    author = UserSerializer(required=True)
+    ingredient = IngredientAmountSerializer(many=True, required=True)
+    is_favorite = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    name = serializers.CharField(
+        required=True,
+        max_length=200,)
+    image = serializers.ImageField()
+    text = serializers.CharField(required=True)
+    cooking_time = serializers.IntegerField(
+        min_value=1,
+        max_value=1440
+    )
+
+    class Meta:
+        model = Recipe
+        fields = ('__all__')

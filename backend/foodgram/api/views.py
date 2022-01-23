@@ -6,7 +6,7 @@ from rest_framework.response import Response
 # from django.shortcuts import get_object_or_404
 from .serializers import (UserSerializer, UserCreateSerializer,
                           PasswordSerializer, TagSerializer,
-                          RecipeSerializer, IngredientSerializer,
+                          RecipeListSerializer, IngredientSerializer,
                           IngredientAmountSerializer)
 from rest_framework.permissions import IsAuthenticated
 
@@ -82,4 +82,9 @@ class IngredientAmountViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RecipeListSerializer
+        # else:
+        #     return RecipeCreateSerializer
