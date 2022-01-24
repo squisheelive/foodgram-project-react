@@ -82,15 +82,6 @@ class RecipeListSerializer(ModelSerializer):
     ingredient = IngredientAmountSerializer(many=True, required=True)
     is_favorite = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    name = serializers.CharField(
-        required=True,
-        max_length=200,)
-    image = serializers.ImageField()
-    text = serializers.CharField(required=True)
-    cooking_time = serializers.IntegerField(
-        min_value=1,
-        max_value=1440
-    )
 
     class Meta:
         model = Recipe
@@ -105,15 +96,12 @@ class RecipeListSerializer(ModelSerializer):
 
 class RecipeCreateSerializer(ModelSerializer):
 
-    tag = TagSerializer(many=True, required=True)
-    author = UserSerializer(required=True)
-    ingredient = IngredientAmountSerializer(many=True, required=True)
-    is_favorite = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    ingredients_id = serializers.SerializerMethodField()
+    tags_id = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField() 
     name = serializers.CharField(
         required=True,
         max_length=200,)
-    image = serializers.ImageField()
     text = serializers.CharField(required=True)
     cooking_time = serializers.IntegerField(
         min_value=1,
