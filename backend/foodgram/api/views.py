@@ -6,7 +6,7 @@ from recipes.models import Tag, Recipe, Ingredient
 # from django.shortcuts import get_object_or_404
 from .serializers import (IngredientAmountSerializer, TagSerializer,
                           RecipeListSerializer, IngredientSerializer,
-                          )
+                          RecipeCreateSerializer)
 # from rest_framework.permissions import IsAuthenticated
 
 
@@ -37,5 +37,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipeListSerializer
-        # else:
-        #     return RecipeCreateSerializer
+        else:
+            return RecipeCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
