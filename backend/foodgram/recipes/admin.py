@@ -27,8 +27,8 @@ class IngredientAmountAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'author', 'image', 'cooking_time')
     empty_value_display = '-пусто-'
-    search_fields = ('author', 'ingredient', 'tag')
-    list_filter = ('tag',)
+    search_fields = ('author', 'ingredients', 'tags')
+    list_filter = ('tags',)
 
 
 class FollowAdmin(admin.ModelAdmin):

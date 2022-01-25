@@ -3,6 +3,7 @@ from rest_framework.serializers import ModelSerializer
 from recipes.models import (User, Tag, Recipe, Ingredient,
                             Follow, IngredientAmount)
 from djoser.serializers import UserCreateSerializer as DjoserCreateSerializer
+from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(ModelSerializer):
@@ -77,26 +78,21 @@ class IngredientAmountSerializer(ModelSerializer):
 
 class IngredientAmountCreateSerializer(ModelSerializer):
 
-    id = IngredientSerializer()
     amount = serializers.IntegerField(min_value=1)
 
     class Meta:
         model = IngredientAmount
-        fields = ('id', 'amount')
-
+        fields = ('ingredient', 'amount')
 
 
 class RecipeListSerializer(ModelSerializer):
 
     tags = TagSerializer(
-        many=True,
-        source='tag'
+        many=True
     )
     author = UserSerializer()
-    ingredients = IngredientAmountSerializer(
+    ingredients = IngredientSerializer(
         many=True,
-        required=True,
-        source='ingredient'
     )
     is_favorite = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -125,31 +121,32 @@ class RecipeListSerializer(ModelSerializer):
 
 class RecipeCreateSerializer(ModelSerializer):
 
-    tags = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Tag.objects.all(),
-        source='tag')    
-    image = serializers.SerializerMethodField()
-    name = serializers.CharField(
-        required=True,
-        max_length=200,)
-    text = serializers.CharField(required=True)
-    cooking_time = serializers.IntegerField(
-        min_value=1,
-        max_value=1440
-    )
+    ingredients = serializers.ListField()
 
     class Meta:
         model = Recipe
-        fields = ('ingredient',
-                  'tags',
-                  'image',
-                  'name',
-                  'text',
-                  'cooking_time')
+        fields = (
+            'tags',
+            'ingredients',
+            'name',
+            'text',
+            'cooking_time'
+        )
 
-    def get_image(self, obj):
-        return False
+    def create(self, validated_data):
 
-# Валидаторы написать для тэгов и ингредиентов
-# 
+        print(validated_data)
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        recipe, status = Recipe.objects.get_or_create(**validated_data)
+        if status is True:
+            recipe.tags.set(tags)
+
+        for ingredient in ingredients:
+            ing = get_object_or_404(Ingredient, pk=ingredient['id'])
+            IngredientAmount.objects.get_or_create(
+                ingredient=ing,
+                recipe=recipe,
+                amount=ingredient['amount']
+            )
+        return recipe

@@ -4,10 +4,10 @@ from . import views
 
 router = routers.DefaultRouter()
 
-# router.register('users', views.UserViewSet)
 router.register('tags', views.TagViewSet)
 router.register('recipes', views.RecipeViewSet)
 router.register('ingredients', views.IngredientViewSet)
+router.register('amounts', views.IngredientAmountViewSet)
 
 
 urlpatterns = [
