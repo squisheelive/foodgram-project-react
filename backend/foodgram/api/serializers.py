@@ -75,17 +75,46 @@ class IngredientAmountSerializer(ModelSerializer):
         return obj.ingredient.measurement_unit
 
 
+class IngredientAmountCreateSerializer(ModelSerializer):
+
+    id = IngredientSerializer()
+    amount = serializers.IntegerField(min_value=1)
+
+    class Meta:
+        model = IngredientAmount
+        fields = ('id', 'amount')
+
+
+
 class RecipeListSerializer(ModelSerializer):
 
-    tag = TagSerializer(many=True)
+    tags = TagSerializer(
+        many=True,
+        source='tag'
+    )
     author = UserSerializer()
-    ingredient = IngredientAmountSerializer(many=True, required=True)
+    ingredients = IngredientAmountSerializer(
+        many=True,
+        required=True,
+        source='ingredient'
+    )
     is_favorite = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        fields = ('__all__')
+        fields = (
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'is_favorite',
+            'is_in_shopping_cart',
+            'name',
+            'image',
+            'text',
+            'cooking_time'
+        )
 
     def get_is_favorite(self, obj):
         return False
@@ -96,9 +125,11 @@ class RecipeListSerializer(ModelSerializer):
 
 class RecipeCreateSerializer(ModelSerializer):
 
-    ingredients_id = serializers.SerializerMethodField()
-    tags_id = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField() 
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all(),
+        source='tag')    
+    image = serializers.SerializerMethodField()
     name = serializers.CharField(
         required=True,
         max_length=200,)
@@ -110,4 +141,15 @@ class RecipeCreateSerializer(ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('__all__')
+        fields = ('ingredient',
+                  'tags',
+                  'image',
+                  'name',
+                  'text',
+                  'cooking_time')
+
+    def get_image(self, obj):
+        return False
+
+# Валидаторы написать для тэгов и ингредиентов
+# 

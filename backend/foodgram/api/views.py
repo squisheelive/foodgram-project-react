@@ -1,9 +1,9 @@
 from rest_framework import viewsets, mixins
-from recipes.models import Tag, Recipe, Ingredient
+from recipes.models import Tag, Recipe, Ingredient, IngredientAmount
 # from rest_framework.serializers import ValidationError
 # from rest_framework.decorators import action
 # from rest_framework.response import Response
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from .serializers import (IngredientAmountSerializer, TagSerializer,
                           RecipeListSerializer, IngredientSerializer,
                           RecipeCreateSerializer)
@@ -41,4 +41,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeCreateSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+
+        print(self.request.data)
+        # ing_list = []
+        # for ingredeient_amount in self.request.data['ingredients']:
+        #     id = ingredeient_amount['id']
+        #     amount = ingredeient_amount['amount']
+        #     ingredient = get_object_or_404(Ingredient, pk=id)
+        #     ing_amount = IngredientAmount.objects.create(
+        #         ingredient=ingredient,
+        #         amount=amount
+        #     )
+        #     ing_list.append(ing_amount)
+        # print(ing_list)
+
+        serializer.save(
+            author=self.request.user,
+        )
