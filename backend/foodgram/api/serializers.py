@@ -3,8 +3,7 @@ from rest_framework.serializers import ModelSerializer
 from recipes.models import (User, Tag, Recipe, Ingredient,
                             Follow, IngredientAmount)
 from djoser.serializers import UserCreateSerializer as DjoserCreateSerializer
-from django.shortcuts import get_object_or_404
-from collections import OrderedDict
+# from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(ModelSerializer):
@@ -73,7 +72,6 @@ class IngredientAmountSerializer(ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-
 class IngredientAmountCreateSerializer(ModelSerializer):
 
     amount = serializers.IntegerField(min_value=1)
@@ -84,7 +82,6 @@ class IngredientAmountCreateSerializer(ModelSerializer):
     class Meta:
         model = IngredientAmount
         fields = ('id', 'amount')
-
 
 
 class RecipeListSerializer(ModelSerializer):
@@ -101,6 +98,7 @@ class RecipeListSerializer(ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
+
         model = Recipe
         fields = (
             'id',
@@ -140,8 +138,6 @@ class RecipeCreateSerializer(ModelSerializer):
 
     def create(self, validated_data):
 
-        print(validated_data)
-
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe, status = Recipe.objects.get_or_create(**validated_data)
@@ -158,11 +154,9 @@ class RecipeCreateSerializer(ModelSerializer):
                     recipe=recipe,
                     amount=amount
                 )
+
         return recipe
 
-    def to_representation(self, instance):
-        data = RecipeListSerializer(
-            instance, context={"request": self.context["request"]}
-        ).data
-        print(data)
-        return data
+    def to_representation(self, value):
+
+        return RecipeListSerializer(value).data
