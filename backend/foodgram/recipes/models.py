@@ -76,7 +76,8 @@ class IngredientAmount(models.Model):
     )
     recipe = models.ForeignKey(
         Recipe,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ing_amount'
     )
 
     def __str__(self):

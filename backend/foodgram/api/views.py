@@ -3,7 +3,7 @@ from recipes.models import Tag, Recipe, Ingredient, IngredientAmount
 # from rest_framework.serializers import ValidationError
 # from rest_framework.decorators import action
 # from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from .serializers import (IngredientAmountSerializer, TagSerializer,
                           RecipeListSerializer, IngredientSerializer,
                           RecipeCreateSerializer,
@@ -34,7 +34,7 @@ class IngredientAmountViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
 
         if self.request.method == 'GET':
-            return IngredientAmountCreateSerializer
+            return IngredientAmountSerializer
         else:
             return IngredientAmountCreateSerializer
 

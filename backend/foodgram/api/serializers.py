@@ -4,6 +4,7 @@ from recipes.models import (User, Tag, Recipe, Ingredient,
                             Follow, IngredientAmount)
 from djoser.serializers import UserCreateSerializer as DjoserCreateSerializer
 from django.shortcuts import get_object_or_404
+from collections import OrderedDict
 
 
 class UserSerializer(ModelSerializer):
@@ -61,28 +62,29 @@ class IngredientSerializer(ModelSerializer):
 
 class IngredientAmountSerializer(ModelSerializer):
 
-    name = serializers.SerializerMethodField()
-    measurement_unit = serializers.SerializerMethodField()
-    amount = serializers.IntegerField(min_value=1)
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit'
+    )
 
     class Meta:
         model = IngredientAmount
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
-    def get_name(self, obj):
-        return obj.ingredient.name
-
-    def get_measurement_unit(self, obj):
-        return obj.ingredient.measurement_unit
 
 
 class IngredientAmountCreateSerializer(ModelSerializer):
 
     amount = serializers.IntegerField(min_value=1)
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all()
+    )
 
     class Meta:
         model = IngredientAmount
-        fields = ('ingredient', 'amount')
+        fields = ('id', 'amount')
+
 
 
 class RecipeListSerializer(ModelSerializer):
@@ -91,8 +93,9 @@ class RecipeListSerializer(ModelSerializer):
         many=True
     )
     author = UserSerializer()
-    ingredients = IngredientSerializer(
+    ingredients = IngredientAmountSerializer(
         many=True,
+        source='ing_amount'
     )
     is_favorite = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -121,7 +124,9 @@ class RecipeListSerializer(ModelSerializer):
 
 class RecipeCreateSerializer(ModelSerializer):
 
-    ingredients = serializers.ListField()
+    ingredients = IngredientAmountCreateSerializer(
+        many=True
+    )
 
     class Meta:
         model = Recipe
@@ -136,17 +141,28 @@ class RecipeCreateSerializer(ModelSerializer):
     def create(self, validated_data):
 
         print(validated_data)
+
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe, status = Recipe.objects.get_or_create(**validated_data)
+
         if status is True:
+
             recipe.tags.set(tags)
 
-        for ingredient in ingredients:
-            ing = get_object_or_404(Ingredient, pk=ingredient['id'])
-            IngredientAmount.objects.get_or_create(
-                ingredient=ing,
-                recipe=recipe,
-                amount=ingredient['amount']
-            )
+            for ing in ingredients:
+                ingredient = ing['id']
+                amount = ing['amount']
+                IngredientAmount.objects.create(
+                    ingredient=ingredient,
+                    recipe=recipe,
+                    amount=amount
+                )
         return recipe
+
+    def to_representation(self, instance):
+        data = RecipeListSerializer(
+            instance, context={"request": self.context["request"]}
+        ).data
+        print(data)
+        return data
