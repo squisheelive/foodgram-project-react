@@ -44,6 +44,13 @@ class UserCreateSerializer(DjoserCreateSerializer):
             'last_name',
             'password',
         )
+        extra_kwargs = {
+            'email': {'required': True},
+            'username': {'required': True},
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'password': {'required': True}
+        }
 
 
 class TagSerializer(ModelSerializer):
