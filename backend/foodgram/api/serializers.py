@@ -4,6 +4,7 @@ from recipes.models import (User, Tag, Recipe, Ingredient,
                             Follow, IngredientAmount)
 from djoser.serializers import UserCreateSerializer as DjoserCreateSerializer
 # from django.shortcuts import get_object_or_404
+from drf_base64.fields import Base64ImageField
 
 
 class UserSerializer(ModelSerializer):
@@ -123,18 +124,28 @@ class RecipeListSerializer(ModelSerializer):
 class RecipeCreateSerializer(ModelSerializer):
 
     ingredients = IngredientAmountCreateSerializer(
-        many=True
+        many=True,
+        required=True
     )
+    image = Base64ImageField(required=True)
 
     class Meta:
         model = Recipe
         fields = (
             'tags',
             'ingredients',
+            'image',
             'name',
             'text',
             'cooking_time'
         )
+        extra_kwargs = {
+            'tags': {'required': True},
+            'ingredients': {'required': True},
+            'name': {'required': True},
+            'text': {'required': True},
+            'cooking_time': {'required': True}
+        }
 
     def create(self, validated_data):
 

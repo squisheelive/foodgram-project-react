@@ -1,13 +1,11 @@
 from rest_framework import viewsets, mixins
-from recipes.models import Tag, Recipe, Ingredient, IngredientAmount
+from recipes.models import Tag, Recipe, Ingredient
 # from rest_framework.serializers import ValidationError
 # from rest_framework.decorators import action
 # from rest_framework.response import Response
 # from django.shortcuts import get_object_or_404
-from .serializers import (IngredientAmountSerializer, TagSerializer,
-                          RecipeListSerializer, IngredientSerializer,
-                          RecipeCreateSerializer,
-                          IngredientAmountCreateSerializer)
+from .serializers import (TagSerializer, RecipeCreateSerializer,
+                          RecipeListSerializer, IngredientSerializer)
 # from rest_framework.permissions import IsAuthenticated
 
 
@@ -26,19 +24,6 @@ class IngredientViewSet(mixins.ListModelMixin,
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    pagination_class = None
-
-
-class IngredientAmountViewSet(viewsets.ModelViewSet):
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'GET':
-            return IngredientAmountSerializer
-        else:
-            return IngredientAmountCreateSerializer
-
-    queryset = IngredientAmount.objects.all()
     pagination_class = None
 
 
