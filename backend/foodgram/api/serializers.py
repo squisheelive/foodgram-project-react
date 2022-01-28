@@ -156,7 +156,6 @@ class RecipeCreateSerializer(ModelSerializer):
         )
         extra_kwargs = {
             'tags': {'required': True},
-            'ingredients': {'required': True},
             'name': {'required': True},
             'text': {'required': True},
             'cooking_time': {'required': True}
