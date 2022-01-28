@@ -128,6 +128,14 @@ class RecipeListSerializer(ModelSerializer):
         return False
 
 
+class RecipeSmallListSerializer(ModelSerializer):
+
+    class Meta:
+
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
 class RecipeCreateSerializer(ModelSerializer):
 
     ingredients = IngredientAmountCreateSerializer(
@@ -178,3 +186,30 @@ class RecipeCreateSerializer(ModelSerializer):
     def to_representation(self, value):
 
         return RecipeListSerializer(value).data
+
+
+class SubscribeListSerializer(UserSerializer):
+
+    recipes = RecipeSmallListSerializer(many=True)
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+        )
+
+    def get_is_subscribed(self, obj):
+
+        return True
+
+    def get_recipes_count(self, obj):
+
+        return obj.recipes.all().count()
