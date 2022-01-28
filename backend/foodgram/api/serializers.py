@@ -187,7 +187,7 @@ class RecipeCreateSerializer(ModelSerializer):
         return RecipeListSerializer(value).data
 
 
-class SubscribeListSerializer(UserSerializer):
+class SubscribeSerializer(UserSerializer):
 
     recipes = RecipeSmallListSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()

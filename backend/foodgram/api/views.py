@@ -1,12 +1,12 @@
 from rest_framework import viewsets, mixins
-from recipes.models import Tag, Recipe, Ingredient
-# from rest_framework.serializers import ValidationError
+from recipes.models import Tag, Recipe, Ingredient, Follow, User
+from rest_framework.serializers import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from .serializers import (TagSerializer, RecipeCreateSerializer,
                           RecipeListSerializer, IngredientSerializer,
-                          SubscribeListSerializer)
+                          SubscribeSerializer)
 # from rest_framework.permissions import IsAuthenticated
 from djoser.views import UserViewSet as DjoserUserViewSet
 
@@ -14,20 +14,51 @@ from djoser.views import UserViewSet as DjoserUserViewSet
 class UserViewSet(DjoserUserViewSet):
 
     @action(['get'], detail=False)
-    def subscriptions(self, request, *args, **kwargs):
+    def subscriptions(self, request):
 
         queryset = [i.following for i in request.user.following.all()]
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = SubscribeListSerializer(
+            serializer = SubscribeSerializer(
                 page,
                 many=True
             )
             return self.get_paginated_response(serializer.data)
-        serializer = SubscribeListSerializer(
+        serializer = SubscribeSerializer(
             queryset,
             many=True
             )
+        return Response(serializer.data)
+
+    @action(['post', 'delete'], detail=True)
+    def subscribe(self, request, id=None):
+
+        current_user = request.user
+        user_to_follow = get_object_or_404(User, pk=id)
+
+        if request.method == "DELETE":
+            following = get_object_or_404(
+                Follow,
+                user=current_user,
+                following=user_to_follow
+            )
+            following.delete()
+            return Response()
+
+        if current_user == user_to_follow:
+            raise ValidationError(
+                {'errors': 'Нельзя подписаться на самого себя!'})
+
+        following, status = Follow.objects.get_or_create(
+            user=current_user,
+            following=user_to_follow
+        )
+
+        if status is False:
+            raise ValidationError(
+                {'errors': 'Вы уже подписаны на этого пользователя!'})
+
+        serializer = SubscribeSerializer(user_to_follow)
         return Response(serializer.data)
 
 
