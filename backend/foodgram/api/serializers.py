@@ -128,7 +128,7 @@ class RecipeListSerializer(ModelSerializer):
         return False
 
 
-class RecipeSmallListSerializer(ModelSerializer):
+class RecipeShortListSerializer(ModelSerializer):
 
     class Meta:
 
@@ -189,7 +189,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
 class SubscribeSerializer(UserSerializer):
 
-    recipes = RecipeSmallListSerializer(many=True)
+    recipes = RecipeShortListSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:

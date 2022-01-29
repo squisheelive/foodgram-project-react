@@ -1,12 +1,13 @@
 from rest_framework import viewsets, mixins
-from recipes.models import Tag, Recipe, Ingredient, Follow, User
+from recipes.models import (Tag, Recipe, Ingredient,
+                            Follow, User, Favorite)
 from rest_framework.serializers import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .serializers import (TagSerializer, RecipeCreateSerializer,
                           RecipeListSerializer, IngredientSerializer,
-                          SubscribeSerializer)
+                          SubscribeSerializer, RecipeShortListSerializer)
 # from rest_framework.permissions import IsAuthenticated
 from djoser.views import UserViewSet as DjoserUserViewSet
 
@@ -91,8 +92,40 @@ class RecipeViewSet(viewsets.ModelViewSet):
         else:
             return RecipeCreateSerializer
 
+    def permission_class(self):
+        # надо тут описать пермишн
+        pass
+
     def perform_create(self, serializer):
 
         serializer.save(
             author=self.request.user
         )
+
+    @action(['post', 'delete'], detail=True)
+    def favorite(self, request, id=None):
+
+        current_user = request.user
+        recipe = get_object_or_404(Recipe, pk=id)
+
+        if request.method == "DELETE":
+            favorite = get_object_or_404(
+                Favorite,
+                user=current_user,
+                recipe=recipe
+            )
+            favorite.delete()
+            return Response()
+
+        favorite, status = Follow.objects.get_or_create(
+            user=current_user,
+            recipe=recipe
+        )
+
+        if status is False:
+            raise ValidationError(
+                {'errors': 'Этот рецепт уже добавлен в избранное!'})
+
+        serializer = RecipeShortListSerializer(recipe)
+        return Response(serializer.data)
+# Написать одну функцию и уноследоваться от нее и к Favorite и к Shopping cart
