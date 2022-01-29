@@ -69,6 +69,9 @@ class Recipe(models.Model):
     text = models.TextField()
     cooking_time = models.IntegerField(validators=[validate_time])
 
+    def __str__(self):
+        return self.name
+
 
 class IngredientAmount(models.Model):
 
@@ -98,7 +101,7 @@ class Favorite(models.Model):
         on_delete=models.CASCADE,
         related_name='favorite'
     )
-    recipe = models.ManyToManyField(Recipe)
+    recipes = models.ManyToManyField(Recipe)
 
 
 class ShopList(models.Model):
@@ -108,4 +111,4 @@ class ShopList(models.Model):
         on_delete=models.CASCADE,
         related_name='shoplist'
     )
-    recipe = models.ManyToManyField(Recipe)
+    recipes = models.ManyToManyField(Recipe)

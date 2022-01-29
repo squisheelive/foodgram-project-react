@@ -103,29 +103,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @action(['post', 'delete'], detail=True)
-    def favorite(self, request, id=None):
+    def favorite(self, request, pk=None):
 
         current_user = request.user
-        recipe = get_object_or_404(Recipe, pk=id)
+        recipe = get_object_or_404(Recipe, pk=pk)
+        obj, status = Favorite.objects.get_or_create(user=current_user)
+        queryset = obj.recipes.all()
 
         if request.method == "DELETE":
-            favorite = get_object_or_404(
-                Favorite,
-                user=current_user,
-                recipe=recipe
-            )
-            favorite.delete()
-            return Response()
+            if recipe in queryset:
+                recipe.favorite_set.remove(obj)
+                return Response()
+            raise ValidationError(
+                {'errors': 'Этого рецепта нет в избранном!'})
 
-        favorite, status = Follow.objects.get_or_create(
-            user=current_user,
-            recipe=recipe
-        )
-
-        if status is False:
+        if recipe in queryset:
             raise ValidationError(
                 {'errors': 'Этот рецепт уже добавлен в избранное!'})
 
+        recipe.favorite_set.add(obj)
         serializer = RecipeShortListSerializer(recipe)
         return Response(serializer.data)
 # Написать одну функцию и уноследоваться от нее и к Favorite и к Shopping cart
