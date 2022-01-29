@@ -104,7 +104,7 @@ class Favorite(models.Model):
     recipes = models.ManyToManyField(Recipe)
 
 
-class ShopList(models.Model):
+class ShoppingCart(models.Model):
 
     user = models.OneToOneField(
         User,

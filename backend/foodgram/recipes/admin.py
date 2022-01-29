@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import (User, Tag, Ingredient,
                      Recipe, IngredientAmount,
-                     Follow, Favorite, ShopList)
+                     Follow, Favorite, ShoppingCart)
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -31,7 +31,7 @@ class IngredientInline(admin.StackedInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'author', 'image', 'cooking_time')
+    list_display = ('pk', 'author', 'name', 'image', 'cooking_time')
     empty_value_display = '-пусто-'
     search_fields = ('author', 'ingredients', 'tags')
     list_filter = ('tags',)
@@ -49,7 +49,7 @@ class FavoriteAdmin(admin.ModelAdmin):
     filter_horizontal = ['recipes', ]
 
 
-class ShopListAdmin(admin.ModelAdmin):
+class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('user',)
     filter_horizontal = ['recipes', ]
 
@@ -61,4 +61,4 @@ admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(IngredientAmount, IngredientAmountAdmin)
 admin.site.register(Follow, FollowAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
-admin.site.register(ShopList, ShopListAdmin)
+admin.site.register(ShoppingCart, ShoppingCartAdmin)

@@ -1,6 +1,7 @@
 from rest_framework import viewsets, mixins
 from recipes.models import (Tag, Recipe, Ingredient,
-                            Follow, User, Favorite)
+                            Follow, User, Favorite,
+                            ShoppingCart)
 from rest_framework.serializers import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -92,9 +93,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         else:
             return RecipeCreateSerializer
 
-    def permission_class(self):
-        # надо тут описать пермишн
-        pass
+    # def get_permissions(self):
+    #     # надо тут описать пермишн
+    #     pass
 
     def perform_create(self, serializer):
 
@@ -107,12 +108,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         current_user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        obj, status = Favorite.objects.get_or_create(user=current_user)
-        queryset = obj.recipes.all()
+        favorite, status = Favorite.objects.get_or_create(user=current_user)
+        queryset = favorite.recipes.all()
 
         if request.method == "DELETE":
             if recipe in queryset:
-                recipe.favorite_set.remove(obj)
+                recipe.favorite_set.remove(favorite)
                 return Response()
             raise ValidationError(
                 {'errors': 'Этого рецепта нет в избранном!'})
@@ -121,7 +122,54 @@ class RecipeViewSet(viewsets.ModelViewSet):
             raise ValidationError(
                 {'errors': 'Этот рецепт уже добавлен в избранное!'})
 
-        recipe.favorite_set.add(obj)
+        recipe.favorite_set.add(favorite)
         serializer = RecipeShortListSerializer(recipe)
         return Response(serializer.data)
-# Написать одну функцию и уноследоваться от нее и к Favorite и к Shopping cart
+
+    @action(['post', 'delete'], detail=True)
+    def shopping_cart(self, request, pk=None):
+
+        current_user = request.user
+        recipe = get_object_or_404(Recipe, pk=pk)
+        cart, status = ShoppingCart.objects.get_or_create(user=current_user)
+        queryset = cart.recipes.all()
+
+        if request.method == "DELETE":
+            if recipe in queryset:
+                recipe.shoppingcart_set.remove(cart)
+                return Response()
+            raise ValidationError(
+                {'errors': 'Этого рецепта нет в корзине!'})
+
+        if recipe in queryset:
+            raise ValidationError(
+                {'errors': 'Этот рецепт уже добавлен в корзину!'})
+
+        recipe.shoppingcart_set.add(cart)
+        serializer = RecipeShortListSerializer(recipe)
+        return Response(serializer.data)
+
+    @action(['get'], detail=False)
+    def download_shopping_cart(self, request):
+
+        current_user = request.user
+        ShoppingCart.objects.get_or_create(user=current_user)
+        recipes = current_user.shoplist.recipes.all()
+
+        if recipes == []:
+            raise ValidationError(
+                {'errors': 'Корзина покупок пуста!'})
+
+        cart = {}
+        for recipe in recipes:
+            ing_amounts = recipe.ing_amount.all()
+            for ing in ing_amounts:
+                if ing.ingredient.name not in cart.keys():
+                    cart[ing.ingredient.name] = ing.amount
+                cart[ing.ingredient.name] += ing.amount
+
+        for i in cart.keys():
+            with open("cart.txt", 'a+', encoding="utf-8") as my_file:
+                my_file.write(f'{i} {cart[i]}\n')
+        
+        return Response(my_file, media_type=text)
