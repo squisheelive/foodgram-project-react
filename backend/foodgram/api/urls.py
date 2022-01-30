@@ -8,10 +8,6 @@ router.register('users', views.UserViewSet)
 router.register('tags', views.TagViewSet)
 router.register('recipes', views.RecipeViewSet)
 router.register('ingredients', views.IngredientViewSet)
-# router.register(
-#     r'users/(?P<user_id>[^/.]+)/subscribe',
-#     views.SubscribeViewSet,
-# )
 
 
 urlpatterns = [

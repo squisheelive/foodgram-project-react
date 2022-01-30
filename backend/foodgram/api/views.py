@@ -11,6 +11,8 @@ from .serializers import (TagSerializer, RecipeCreateSerializer,
                           SubscribeSerializer, RecipeShortListSerializer)
 # from rest_framework.permissions import IsAuthenticated
 from djoser.views import UserViewSet as DjoserUserViewSet
+from django.conf import settings
+from django.http import FileResponse
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -166,10 +168,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             for ing in ing_amounts:
                 if ing.ingredient.name not in cart.keys():
                     cart[ing.ingredient.name] = ing.amount
-                cart[ing.ingredient.name] += ing.amount
+                else:
+                    cart[ing.ingredient.name] += ing.amount
 
+        file_name = f'{current_user.username}.txt'
+        file_path = settings.MEDIA_ROOT + '/shopping-carts/' + file_name
+
+        cart_file = open(file_path, 'w+', encoding="utf-8")
         for i in cart.keys():
-            with open("cart.txt", 'a+', encoding="utf-8") as my_file:
-                my_file.write(f'{i} {cart[i]}\n')
-        
-        return Response(my_file, media_type=text)
+            cart_file.write(f'{i} {cart[i]}\n')
+        cart_file.close()
+
+        return FileResponse(
+            open(file_path, 'rb'),
+            as_attachment=True,
+        )
