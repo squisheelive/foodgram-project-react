@@ -14,6 +14,7 @@ from djoser.views import UserViewSet as DjoserUserViewSet
 from django.conf import settings
 from django.http import FileResponse
 from django.db.models import Sum
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -88,6 +89,8 @@ class IngredientViewSet(mixins.ListModelMixin,
 class RecipeViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('tags',)
 
     def get_serializer_class(self):
 

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'colorfield',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'djoser',
     'drf_base64',
     'api',
