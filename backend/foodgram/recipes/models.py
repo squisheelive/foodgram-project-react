@@ -111,4 +111,7 @@ class ShoppingCart(models.Model):
         on_delete=models.CASCADE,
         related_name='shoplist'
     )
-    recipes = models.ManyToManyField(Recipe)
+    recipes = models.ManyToManyField(
+        Recipe,
+        related_name='shoplist'
+    )

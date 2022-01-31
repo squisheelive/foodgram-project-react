@@ -13,6 +13,7 @@ from .serializers import (TagSerializer, RecipeCreateSerializer,
 from djoser.views import UserViewSet as DjoserUserViewSet
 from django.conf import settings
 from django.http import FileResponse
+from django.db.models import Sum
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -155,28 +156,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
 
         current_user = request.user
-        ShoppingCart.objects.get_or_create(user=current_user)
-        recipes = current_user.shoplist.recipes.all()
+        recipes = Recipe.objects.filter(shoplist__user=current_user)
 
-        if recipes == []:
+        if len(recipes) == 0:
             raise ValidationError(
                 {'errors': 'Корзина покупок пуста!'})
 
-        cart = {}
-        for recipe in recipes:
-            ing_amounts = recipe.ing_amount.all()
-            for ing in ing_amounts:
-                if ing.ingredient.name not in cart.keys():
-                    cart[ing.ingredient.name] = ing.amount
-                else:
-                    cart[ing.ingredient.name] += ing.amount
+        ing_amounts = Ingredient.objects.filter(
+            recipes__in=recipes).annotate(
+                total_amount=Sum('ingredientamount__amount'))
+
+        for i in ing_amounts:
+            print(f'{i.name} - {i.total_amount} {i.measurement_unit}')
+
+        if len(recipes) == 0:
+            raise ValidationError(
+                {'errors': 'Корзина покупок пуста!'})
 
         file_name = f'{current_user.username}.txt'
         file_path = settings.MEDIA_ROOT + '/shopping-carts/' + file_name
-
         cart_file = open(file_path, 'w+', encoding="utf-8")
-        for i in cart.keys():
-            cart_file.write(f'{i} {cart[i]}\n')
+        cart_file.write(f'Список покупок пользователя '
+                        f'{current_user.username}:\n\n')
+
+        for i in ing_amounts:
+            words = len(i.name)
+            spacers = ' ' * (50 - words)
+            cart_file.write(f'{i.name}{spacers}'
+                            f'{i.total_amount} {i.measurement_unit}\n')
         cart_file.close()
 
         return FileResponse(
