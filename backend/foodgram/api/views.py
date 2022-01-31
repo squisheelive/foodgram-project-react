@@ -169,13 +169,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipes__in=recipes).annotate(
                 total_amount=Sum('ingredientamount__amount'))
 
-        for i in ing_amounts:
-            print(f'{i.name} - {i.total_amount} {i.measurement_unit}')
-
-        if len(recipes) == 0:
-            raise ValidationError(
-                {'errors': 'Корзина покупок пуста!'})
-
         file_name = f'{current_user.username}.txt'
         file_path = settings.MEDIA_ROOT + '/shopping-carts/' + file_name
         cart_file = open(file_path, 'w+', encoding="utf-8")
@@ -183,10 +176,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                         f'{current_user.username}:\n\n')
 
         for i in ing_amounts:
-            words = len(i.name)
+            words = len(i.name) + len(i.measurement_unit)
             spacers = ' ' * (50 - words)
-            cart_file.write(f'{i.name}{spacers}'
-                            f'{i.total_amount} {i.measurement_unit}\n')
+            cart_file.write(f'{i.name} ({i.measurement_unit})'
+                            f'{spacers}{i.total_amount}\n')
         cart_file.close()
 
         return FileResponse(
