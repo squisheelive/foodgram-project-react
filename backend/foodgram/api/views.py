@@ -9,7 +9,8 @@ from django.shortcuts import get_object_or_404
 from .serializers import (TagSerializer, RecipeCreateSerializer,
                           RecipeListSerializer, IngredientSerializer,
                           SubscribeSerializer, RecipeShortListSerializer)
-# from rest_framework.permissions import IsAuthenticated
+# from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import IsOwnerAdminOrReadOnly
 from djoser.views import UserViewSet as DjoserUserViewSet
 from django.conf import settings
 from django.http import FileResponse
@@ -91,6 +92,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('tags',)
+    permission_classes = [IsOwnerAdminOrReadOnly]
 
     def get_serializer_class(self):
 
@@ -98,10 +100,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeListSerializer
         else:
             return RecipeCreateSerializer
-
-    # def get_permissions(self):
-    #     # надо тут описать пермишн
-    #     pass
 
     def perform_create(self, serializer):
 
@@ -111,24 +109,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(['post', 'delete'], detail=True)
     def favorite(self, request, pk=None):
-
+        # нужно тут написать универсальную функцию для favorite и shopping_cart
         current_user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        favorite, status = Favorite.objects.get_or_create(user=current_user)
-        queryset = favorite.recipes.all()
+        obj, status = Favorite.objects.get_or_create(user=current_user)
 
         if request.method == "DELETE":
-            if recipe in queryset:
-                recipe.favorite_set.remove(favorite)
+            if recipe in obj.recipes.all():
+                obj.recipes.remove(recipe)
                 return Response()
             raise ValidationError(
                 {'errors': 'Этого рецепта нет в избранном!'})
 
-        if recipe in queryset:
+        if recipe in obj.recipes.all():
             raise ValidationError(
                 {'errors': 'Этот рецепт уже добавлен в избранное!'})
 
-        recipe.favorite_set.add(favorite)
+        obj.recipes.add(recipe)
         serializer = RecipeShortListSerializer(recipe)
         return Response(serializer.data)
 
@@ -138,20 +135,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         current_user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         cart, status = ShoppingCart.objects.get_or_create(user=current_user)
-        queryset = cart.recipes.all()
 
         if request.method == "DELETE":
-            if recipe in queryset:
-                recipe.shoppingcart_set.remove(cart)
+            if recipe in cart.recipes.all():
+                cart.recipes.remove(recipe)
                 return Response()
             raise ValidationError(
                 {'errors': 'Этого рецепта нет в корзине!'})
 
-        if recipe in queryset:
+        if recipe in cart.recipes.all():
             raise ValidationError(
                 {'errors': 'Этот рецепт уже добавлен в корзину!'})
 
-        recipe.shoppingcart_set.add(cart)
+        cart.recipes.add(recipe)
         serializer = RecipeShortListSerializer(recipe)
         return Response(serializer.data)
 
