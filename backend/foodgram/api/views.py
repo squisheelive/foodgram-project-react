@@ -107,49 +107,42 @@ class RecipeViewSet(viewsets.ModelViewSet):
             author=self.request.user
         )
 
-    @action(['post', 'delete'], detail=True)
-    def favorite(self, request, pk=None):
-        # нужно тут написать универсальную функцию для favorite и shopping_cart
+    def favorite_or_shopping_cart(self, request, pk=None, model=None):
+
         current_user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        obj, status = Favorite.objects.get_or_create(user=current_user)
+        obj, status = model.objects.get_or_create(user=current_user)
 
         if request.method == "DELETE":
             if recipe in obj.recipes.all():
                 obj.recipes.remove(recipe)
                 return Response()
             raise ValidationError(
-                {'errors': 'Этого рецепта нет в избранном!'})
+                {'errors': f'{model._meta.verbose_name} '
+                           f'не содержит этот рецепт!'})
 
         if recipe in obj.recipes.all():
             raise ValidationError(
-                {'errors': 'Этот рецепт уже добавлен в избранное!'})
+                {'errors': f'Этот рецепт уже добавлен '
+                           f'в {model._meta.verbose_name}!'})
 
         obj.recipes.add(recipe)
         serializer = RecipeShortListSerializer(recipe)
         return Response(serializer.data)
 
     @action(['post', 'delete'], detail=True)
-    def shopping_cart(self, request, pk=None):
+    def favorite(self, request, pk=None, model=Favorite):
 
-        current_user = request.user
-        recipe = get_object_or_404(Recipe, pk=pk)
-        cart, status = ShoppingCart.objects.get_or_create(user=current_user)
+        return self.favorite_or_shopping_cart(request=request,
+                                              pk=pk,
+                                              model=model)
 
-        if request.method == "DELETE":
-            if recipe in cart.recipes.all():
-                cart.recipes.remove(recipe)
-                return Response()
-            raise ValidationError(
-                {'errors': 'Этого рецепта нет в корзине!'})
+    @action(['post', 'delete'], detail=True)
+    def shopping_cart(self, request, pk=None, model=ShoppingCart()):
 
-        if recipe in cart.recipes.all():
-            raise ValidationError(
-                {'errors': 'Этот рецепт уже добавлен в корзину!'})
-
-        cart.recipes.add(recipe)
-        serializer = RecipeShortListSerializer(recipe)
-        return Response(serializer.data)
+        return self.favorite_or_shopping_cart(request=request,
+                                              pk=pk,
+                                              model=model)
 
     @action(['get'], detail=False)
     def download_shopping_cart(self, request):
