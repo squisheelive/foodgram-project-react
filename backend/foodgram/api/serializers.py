@@ -92,7 +92,7 @@ class IngredientAmountCreateSerializer(ModelSerializer):
 
 
 class RecipeListSerializer(ModelSerializer):
-# подписки и шопинг карт нужно сделать
+
     tags = TagSerializer(
         many=True
     )
@@ -121,9 +121,15 @@ class RecipeListSerializer(ModelSerializer):
         )
 
     def get_is_favorite(self, obj):
+        if self.context:
+            current_user = self.context['request'].user
+            return current_user.favorite.recipes.all().contains(obj)
         return False
 
     def get_is_in_shopping_cart(self, obj):
+        if self.context:
+            current_user = self.context['request'].user
+            return current_user.shoplist.recipes.all().contains(obj)
         return False
 
 
@@ -136,7 +142,7 @@ class RecipeShortListSerializer(ModelSerializer):
 
 
 class RecipeCreateSerializer(ModelSerializer):
-# прописать все fields нужно для валидации
+
     ingredients = IngredientAmountCreateSerializer(
         many=True,
         required=True

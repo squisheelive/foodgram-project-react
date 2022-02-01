@@ -21,8 +21,8 @@ class UserViewSet(DjoserUserViewSet):
 
     @action(['get'], detail=False)
     def subscriptions(self, request):
-    # переписать queryset нормально через ОРМ
-        queryset = [i.following for i in request.user.following.all()]
+
+        queryset = User.objects.filter(user__in=request.user.following.all())
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = SubscribeSerializer(
