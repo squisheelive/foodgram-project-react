@@ -9,7 +9,6 @@ from django.shortcuts import get_object_or_404
 from .serializers import (TagSerializer, RecipeCreateSerializer,
                           RecipeListSerializer, IngredientSerializer,
                           SubscribeSerializer, RecipeShortListSerializer)
-# from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .permissions import IsOwnerAdminOrReadOnly
 from djoser.views import UserViewSet as DjoserUserViewSet
 from django.conf import settings
