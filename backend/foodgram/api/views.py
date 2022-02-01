@@ -123,8 +123,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if recipe in obj.recipes.all():
             raise ValidationError(
-                {'errors': f'Этот рецепт уже добавлен '
-                           f'в {model._meta.verbose_name}!'})
+                {'errors': f'{model._meta.verbose_name} '
+                           f'уже содержит этот рецепт!'})
 
         obj.recipes.add(recipe)
         serializer = RecipeShortListSerializer(recipe)
@@ -138,7 +138,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                               model=model)
 
     @action(['post', 'delete'], detail=True)
-    def shopping_cart(self, request, pk=None, model=ShoppingCart()):
+    def shopping_cart(self, request, pk=None, model=ShoppingCart):
 
         return self.favorite_or_shopping_cart(request=request,
                                               pk=pk,
