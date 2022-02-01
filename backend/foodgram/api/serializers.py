@@ -3,7 +3,6 @@ from rest_framework.serializers import ModelSerializer
 from recipes.models import (User, Tag, Recipe, Ingredient,
                             Follow, IngredientAmount)
 from djoser.serializers import UserCreateSerializer as DjoserCreateSerializer
-# from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 
 
@@ -93,7 +92,7 @@ class IngredientAmountCreateSerializer(ModelSerializer):
 
 
 class RecipeListSerializer(ModelSerializer):
-
+# подписки и шопинг карт нужно сделать
     tags = TagSerializer(
         many=True
     )
@@ -137,7 +136,7 @@ class RecipeShortListSerializer(ModelSerializer):
 
 
 class RecipeCreateSerializer(ModelSerializer):
-
+# прописать все fields нужно для валидации
     ingredients = IngredientAmountCreateSerializer(
         many=True,
         required=True
