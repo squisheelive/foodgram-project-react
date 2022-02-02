@@ -31,12 +31,18 @@ class IngredientInline(admin.StackedInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'author', 'name', 'image', 'cooking_time')
+    list_display = ('pk', 'author', 'name', 'in_favorite')
     empty_value_display = '-пусто-'
     search_fields = ('author', 'ingredients', 'tags')
     list_filter = ('tags',)
     filter_horizontal = ('tags',)
     inlines = [IngredientInline, ]
+    readonly_fields = ('in_favorite',)
+
+    def in_favorite(self, obj):
+        return obj.favorite.all().count()
+
+    in_favorite.short_description = 'В избранном'
 
 
 class FollowAdmin(admin.ModelAdmin):
