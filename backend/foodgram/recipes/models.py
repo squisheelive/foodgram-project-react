@@ -154,6 +154,7 @@ class Favorite(models.Model):
     )
     recipes = models.ManyToManyField(
         Recipe,
+        related_name='favorite',
         verbose_name='рецепты'
     )
 
