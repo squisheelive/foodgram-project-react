@@ -14,7 +14,7 @@ services:
       - .env
       
   backend:
-    image: squishee/foodgram:v1.1
+    image: squishee/foodgram:v1.3
     restart: always
     volumes:
       - static_value:/app/static/
