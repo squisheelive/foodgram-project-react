@@ -77,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://foodgram.ddns.net/', 'http://51.250.8.175']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://foodgram.ddns.net', 'http://51.250.8.175']
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
