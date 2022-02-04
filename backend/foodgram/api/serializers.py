@@ -1,7 +1,7 @@
 from djoser.serializers import UserCreateSerializer as DjoserCreateSerializer
 from drf_base64.fields import Base64ImageField
 from recipes.models import (Follow, Ingredient, IngredientAmount, Recipe, Tag,
-                            User)
+                            User, ShoppingCart, Favorite)
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -124,15 +124,15 @@ class RecipeListSerializer(ModelSerializer):
         if self.context:
             current_user = self.context['request'].user
             if current_user.is_authenticated:
-                if current_user.favorite.exists():
-                    return current_user.favorite.recipes.all().contains(obj)
+                Favorite.objects.get_or_create(user=current_user)
+                return current_user.favorite.recipes.all().contains(obj)
         return False
 
     def get_is_in_shopping_cart(self, obj):
         if self.context:
             current_user = self.context['request'].user
             if current_user.is_authenticated:
-                current_user.shoplist.exists()
+                ShoppingCart.objects.get_or_create(user=current_user)
                 return current_user.shoplist.recipes.all().contains(obj)
         return False
 
