@@ -33,7 +33,7 @@ class UserViewSet(DjoserUserViewSet):
         serializer = SubscribeSerializer(
             queryset,
             many=True
-            )
+        )
         return Response(serializer.data)
 
     @action(['post', 'delete'], detail=True)
