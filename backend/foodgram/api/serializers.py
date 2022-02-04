@@ -123,13 +123,15 @@ class RecipeListSerializer(ModelSerializer):
     def get_is_favorite(self, obj):
         if self.context:
             current_user = self.context['request'].user
-            return current_user.favorite.recipes.all().contains(obj)
+            if current_user.is_authenticated:
+                return current_user.favorite.recipes.all().contains(obj)
         return False
 
     def get_is_in_shopping_cart(self, obj):
         if self.context:
             current_user = self.context['request'].user
-            return current_user.shoplist.recipes.all().contains(obj)
+            if current_user.is_authenticated:
+                return current_user.shoplist.recipes.all().contains(obj)
         return False
 
 
