@@ -158,7 +158,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 total_amount=Sum('ingredientamount__amount'))
 
         file_name = f'{current_user.username}.txt'
-        file_path = settings.MEDIA_ROOT + '/shopping-carts/' + file_name
+        file_path = settings.MEDIA_ROOT + file_name
         cart_file = open(file_path, 'w+', encoding="utf-8")
         cart_file.write(f'Список покупок пользователя '
                         f'{current_user.username}:\n\n')
