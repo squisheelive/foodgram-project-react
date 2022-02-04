@@ -78,4 +78,4 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             # Сборка и запуск контейнера
-            sudo docker-compose up -d --build
+            sudo docker-compose up -d
