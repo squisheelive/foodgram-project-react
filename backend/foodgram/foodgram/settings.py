@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q1=f8j#ne02ebt=46mjg!uz2-bwknubv+4(p8og&3%*!8zu=k1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['backend', '127.0.0.1', 'localhost', 'http://squishee.ga/', '51.250.8.175']
+ALLOWED_HOSTS = ['backend', '127.0.0.1', 'localhost', 'http://foodgram.ddns.net', '51.250.8.175']
 
 
 # Application definition
@@ -77,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://squishee.ga', 'http://51.250.8.175']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://foodgram.ddns.net/', 'http://51.250.8.175']
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -129,9 +129,9 @@ AUTH_USER_MODEL = 'recipes.User'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/backend_static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'backend_static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
