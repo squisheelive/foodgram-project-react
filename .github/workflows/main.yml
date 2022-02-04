@@ -69,6 +69,7 @@ jobs:
           script: |
             sudo docker-compose stop
             sudo docker-compose rm backend
+            sudo docker-compose image rm squishee/foodgram:latest
             # Добавление переменных окружения для базы данных
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
