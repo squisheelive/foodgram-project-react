@@ -6,11 +6,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
                             Tag, User)
-from rest_framework import mixins, viewsets
+from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from .filters import RecipeFilter
 from .permissions import IsOwnerAdminOrReadOnly
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
                           RecipeListSerializer, RecipeShortListSerializer,
@@ -84,13 +85,15 @@ class IngredientViewSet(mixins.ListModelMixin,
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^name', ]
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('tags',)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RecipeFilter
     permission_classes = [IsOwnerAdminOrReadOnly]
 
     def get_serializer_class(self):
@@ -120,13 +123,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {'errors': f'{model._meta.verbose_name} '
                            f'не содержит этот рецепт!'})
 
-        if recipe in obj.recipes.all():
-            raise ValidationError(
-                {'errors': f'{model._meta.verbose_name} '
-                           f'уже содержит этот рецепт!'})
-
-        obj.recipes.add(recipe)
         serializer = RecipeShortListSerializer(recipe)
+
+        if recipe not in obj.recipes.all():
+            obj.recipes.add(recipe)
+
         return Response(serializer.data)
 
     @action(['post', 'delete'], detail=True)
@@ -161,7 +162,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         file_path = settings.MEDIA_ROOT + file_name
         cart_file = open(file_path, 'w+', encoding="utf-8")
         cart_file.write(f'Список покупок пользователя '
-                        f'{current_user.username}:\n\n')
+                        f'{current_user.first_name} '
+                        f'{current_user.last_name}:\n\n')
 
         for i in ing_amounts:
             words = len(i.name) + len(i.measurement_unit)
