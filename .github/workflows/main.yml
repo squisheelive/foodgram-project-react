@@ -67,7 +67,8 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker-compose stop
-            sudo docker-compose rm backend
+            sudo docker-compose rm -f backend
+            sudo docker image rm squishee/foodgram
             # Добавление переменных окружения для базы данных
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
