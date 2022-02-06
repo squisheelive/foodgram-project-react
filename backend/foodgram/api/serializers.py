@@ -181,15 +181,47 @@ class RecipeCreateSerializer(ModelSerializer):
             recipe.tags.set(tags)
 
             for ing in ingredients:
-                ingredient = ing['id']
-                amount = ing['amount']
                 IngredientAmount.objects.create(
-                    ingredient=ingredient,
+                    ingredient=ing['id'],
                     recipe=recipe,
-                    amount=amount
+                    amount=ing['amount']
                 )
 
         return recipe
+
+    def update(self, instance, validated_data):
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time)
+        instance.text = validated_data.get('text', instance.text)
+        instance.image = validated_data.get('image', instance.image)
+
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+
+        if tags:
+            instance.tags.clear()
+            instance.tags.set(tags)
+
+        if ingredients:
+            old_ingredients = IngredientAmount.objects.filter(recipe=instance)
+            new_ingredients = []
+
+            for ing in ingredients:
+                ingredient, status = IngredientAmount.objects.get_or_create(
+                    ingredient=ing['id'],
+                    recipe=instance,
+                    amount=ing['amount']
+                )
+                new_ingredients.append(ingredient)
+
+            for ing in old_ingredients:
+                if ing not in new_ingredients:
+                    ing.delete()
+
+        instance.save()
+        return instance
 
     def to_representation(self, value):
 
