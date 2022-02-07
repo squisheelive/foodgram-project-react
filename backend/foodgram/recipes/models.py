@@ -139,8 +139,13 @@ class IngredientAmount(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингредиент'
-        verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name='unique_ingredient_in_recipe'),
+        ]
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
 
     def __str__(self):
         return (f'{self.ingredient.name} - {self.amount} '
@@ -162,6 +167,11 @@ class Favorite(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipes'],
+                name='unique_user_recipes'),
+        ]
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
 

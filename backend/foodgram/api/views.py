@@ -4,12 +4,13 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
-from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
-                            Tag, User)
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
+
+from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
+                            Tag, User)
 
 from .filters import RecipeFilter
 from .permissions import IsOwnerAdminOrReadOnly
@@ -52,9 +53,12 @@ class UserViewSet(DjoserUserViewSet):
             following.delete()
             return Response()
 
+        # Зачем выносить эту проверку сериализатор, если на входе
+        # метод 'subscribe' не нуждается в никаких сериализованных данных?
         if current_user == user_to_follow:
             raise ValidationError(
-                {'errors': 'Нельзя подписаться на самого себя!'})
+                {'errors': 'Нельзя подписаться на самого себя!'}
+            )
 
         following, status = Follow.objects.get_or_create(
             user=current_user,
@@ -63,7 +67,8 @@ class UserViewSet(DjoserUserViewSet):
 
         if status is False:
             raise ValidationError(
-                {'errors': 'Вы уже подписаны на этого пользователя!'})
+                {'errors': 'Вы уже подписаны на этого пользователя!'}
+            )
 
         serializer = SubscribeSerializer(user_to_follow)
         return Response(serializer.data)
@@ -100,8 +105,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if self.request.method == 'GET':
             return RecipeListSerializer
-        else:
-            return RecipeCreateSerializer
+        return RecipeCreateSerializer
 
     def perform_create(self, serializer):
 

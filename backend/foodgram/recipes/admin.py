@@ -21,9 +21,9 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-# class IngredientAmountAdmin(admin.ModelAdmin):
-#     list_display = ('ingredient', 'amount')
-#     empty_value_display = '-пусто-'
+class IngredientAmountAdmin(admin.ModelAdmin):
+    list_display = ('ingredient', 'amount')
+    empty_value_display = '-пусто-'
 
 
 class IngredientInline(admin.StackedInline):
@@ -64,7 +64,7 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
-# admin.site.register(IngredientAmount, IngredientAmountAdmin)
+admin.site.register(IngredientAmount, IngredientAmountAdmin)
 admin.site.register(Follow, FollowAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(ShoppingCart, ShoppingCartAdmin)

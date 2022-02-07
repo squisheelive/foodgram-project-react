@@ -1,6 +1,7 @@
 import csv
 
 from django.core.management.base import BaseCommand, CommandError
+
 from recipes.models import Ingredient
 
 
@@ -49,7 +50,6 @@ class Command(BaseCommand):
                 for data in csv_reader:
                     self.insert_table_to_db(data)
                     line_count += 1
-                    print(f'{line_count} added to {self.model_name}')
             self.stdout.write(
                 self.style.SUCCESS(
                     f'{line_count} entries added to {self.model_name}'

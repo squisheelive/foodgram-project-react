@@ -1,9 +1,10 @@
 from djoser.serializers import UserCreateSerializer as DjoserCreateSerializer
 from drf_base64.fields import Base64ImageField
-from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
-                            Recipe, ShoppingCart, Tag, User)
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+
+from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag, User)
 
 
 class UserSerializer(ModelSerializer):
@@ -173,6 +174,15 @@ class RecipeCreateSerializer(ModelSerializer):
     def create(self, validated_data):
 
         ingredients = validated_data.pop('ingredients')
+        ingredients_ids = []
+        for ing in ingredients:
+            if ing['id'] in ingredients_ids:
+                name = Ingredient.objects.get(pk=ing['id']).name
+                raise serializers.ValidationError(
+                    {'errors': f'Ингредиент {name} повторяется!'}
+                )
+            ingredients_ids.append(ing['id'])
+
         tags = validated_data.pop('tags')
         recipe, status = Recipe.objects.get_or_create(**validated_data)
 
@@ -206,19 +216,16 @@ class RecipeCreateSerializer(ModelSerializer):
 
         if ingredients:
             old_ingredients = IngredientAmount.objects.filter(recipe=instance)
-            new_ingredients = []
+
+            for old_ing in old_ingredients:
+                old_ing.delete()
 
             for ing in ingredients:
-                ingredient, status = IngredientAmount.objects.get_or_create(
+                IngredientAmount.objects.create(
                     ingredient=ing['id'],
                     recipe=instance,
                     amount=ing['amount']
                 )
-                new_ingredients.append(ingredient)
-
-            for ing in old_ingredients:
-                if ing not in new_ingredients:
-                    ing.delete()
 
         instance.save()
         return instance
