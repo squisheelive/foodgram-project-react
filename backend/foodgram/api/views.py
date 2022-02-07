@@ -4,13 +4,12 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
+from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
+                            Tag, User)
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-
-from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
-                            Tag, User)
 
 from .filters import RecipeFilter
 from .permissions import IsOwnerAdminOrReadOnly
