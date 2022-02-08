@@ -121,7 +121,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == "DELETE":
             if recipe in obj.recipes.all():
                 obj.recipes.remove(recipe)
-                return Response()
+                serializer = RecipeShortListSerializer(recipe)
+                return Response(serializer.data)
             raise ValidationError(
                 {'errors': f'{model._meta.verbose_name} '
                            f'не содержит этот рецепт!'})
