@@ -236,8 +236,9 @@ class RecipeCreateSerializer(ModelSerializer):
 
 class SubscribeSerializer(UserSerializer):
 
-    recipes = RecipeShortListSerializer(many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
+    get_is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -254,7 +255,31 @@ class SubscribeSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
 
-        return True
+        current_user = self.context['request'].user
+        params = self.context['request'].GET
+        return Follow.objects.filter(
+            user=current_user,
+            following=obj
+        ).exists()
+    
+    def get_recipes(self, obj):
+
+        if 'recipes_limit' in self.context['request'].GET:
+            recipes_limit = self.context['request'].GET['recipes_limit']
+            queryset = obj.recipes.all()[:(int(recipes_limit))]
+            return RecipeShortListSerializer(
+                instance=queryset,
+                many=True
+            ).data
+        
+        return RecipeShortListSerializer(
+                instance=obj.recipes.all(),
+                many=True
+            ).data
+
+        
+
+        
 
     def get_recipes_count(self, obj):
 
