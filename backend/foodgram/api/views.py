@@ -28,11 +28,17 @@ class UserViewSet(DjoserUserViewSet):
         if page is not None:
             serializer = SubscribeSerializer(
                 page,
-                many=True
+                many=True,
+                context={
+                    'request': request
+                }
             )
             return self.get_paginated_response(serializer.data)
         serializer = SubscribeSerializer(
             queryset,
+            context={
+                'request': request
+            },
             many=True
         )
         return Response(serializer.data)
@@ -69,7 +75,11 @@ class UserViewSet(DjoserUserViewSet):
                 {'errors': 'Вы уже подписаны на этого пользователя!'}
             )
 
-        serializer = SubscribeSerializer(user_to_follow)
+        serializer = SubscribeSerializer(
+            user_to_follow,
+            context={
+                'request': request
+            })
         return Response(serializer.data)
 
 

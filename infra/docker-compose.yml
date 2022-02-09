@@ -14,10 +14,10 @@ services:
       - .env
       
   backend:
-    image: squishee/foodgram:latest
-    # build:
-    #   context: ../backend/foodgram
-    #   dockerfile: Dockerfile
+    # image: squishee/foodgram:latest
+    build:
+      context: ../backend/foodgram
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/backend_static/
