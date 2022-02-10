@@ -153,10 +153,7 @@ class IngredientAmount(models.Model):
 
 
 class Favorite(models.Model):
-    # Насколько я понял, то, в 'through' модели, которую джанго автоматически
-    # создает для связи ManyToMany отношений по дефолту настроен
-    # UniqueConstraint для полей 'from' и 'to'. Во всяком случае,
-    # так написано в документации django=4.0,который я использую
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,

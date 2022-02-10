@@ -101,7 +101,7 @@ class RecipeListSerializer(ModelSerializer):
         many=True,
         source='ing_amount'
     )
-    is_favorite = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
@@ -112,7 +112,7 @@ class RecipeListSerializer(ModelSerializer):
             'tags',
             'author',
             'ingredients',
-            'is_favorite',
+            'is_favorited',
             'is_in_shopping_cart',
             'name',
             'image',
@@ -120,7 +120,7 @@ class RecipeListSerializer(ModelSerializer):
             'cooking_time'
         )
 
-    def get_is_favorite(self, obj):
+    def get_is_favorited(self, obj):
         if self.context:
             current_user = self.context['request'].user
             if current_user.is_authenticated:

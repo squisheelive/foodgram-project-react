@@ -6,7 +6,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from recipes.models import (Favorite, Follow, Ingredient, Recipe, ShoppingCart,
                             Tag, User)
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters, mixins
+from rest_framework import status as response_status
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -56,10 +58,8 @@ class UserViewSet(DjoserUserViewSet):
                 following=user_to_follow
             )
             following.delete()
-            return Response()
+            return Response(status=response_status.HTTP_204_NO_CONTENT)
 
-        # Зачем выносить эту проверку сериализатор, если на входе
-        # метод 'subscribe' не нуждается в никаких сериализованных данных?
         if current_user == user_to_follow:
             raise ValidationError(
                 {'errors': 'Нельзя подписаться на самого себя!'}
@@ -132,7 +132,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             if recipe in obj.recipes.all():
                 obj.recipes.remove(recipe)
                 serializer = RecipeShortListSerializer(recipe)
-                return Response(serializer.data)
+                return Response(status=response_status.HTTP_204_NO_CONTENT)
             raise ValidationError(
                 {'errors': f'{model._meta.verbose_name} '
                            f'не содержит этот рецепт!'})
