@@ -2,7 +2,7 @@
 
 ![Foodgram-project-react](https://github.com/squisheelive/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 #### Дипломный проект курса python-разработчик от Яндеск Практикум.
-В этом проекте реализован API для небольшого сервиса по созданию и обмену рецептами. Бэкенд реализован на основе [Django REST framework](https://www.django-rest-framework.org/) под уже готовый [React](https://ru.reactjs.org/) фронтенд. Сервис развернут через контейнеризацию [Docker](https://www.docker.com/), на мощностях Yandex Cloud и доступен по адресу: http://foodgram.ddns.net/
+В этом проекте реализован API для небольшого сервиса по созданию и обмену рецептами. Бэкенд реализован на основе [Django REST framework](https://www.django-rest-framework.org/) под уже готовый [React](https://ru.reactjs.org/) фронтенд. Сервис развернут через контейнеризацию [Docker](https://www.docker.com/), на мощностях Yandex Cloud и доступен по адресу: http://51.250.8.175/
 #### Для запуска проекта локально:
 
 - Клонировать репозиторий и перейти директорию `/infra`.
